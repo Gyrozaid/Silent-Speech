@@ -7,7 +7,7 @@ import pickle
 import time
 from collections import deque
 from sklearn.preprocessing import MinMaxScaler
-from real_time_svm.application.spotify_controller import SpotifyController
+from spotify_controller import SpotifyController
 
 # Configuration
 port = 'COM8'
@@ -29,7 +29,7 @@ model = random_forest
 with open("scaler.pkl", "rb") as file:
     scaler = pickle.load(file)
 
-# Variables
+# Vars
 data_buffer = deque(maxlen=window_size * sample_rate)
 motion_detected = False
 motion_start_time = None
@@ -38,6 +38,9 @@ spotify = SpotifyController()
 ser = None
 run_detection = False
 
+def log_message(message):
+    output_text.insert(tk.END, message + "\n")
+    output_text.see(tk.END)
 
 def motion_detection():
     global motion_detected, motion_start_time, full, run_detection, data_buffer
@@ -45,8 +48,8 @@ def motion_detection():
     try:
         ser = serial.Serial(port, baud_rate)
         ser.reset_input_buffer()
-        print("Listening for data from ESP32...")
-        print("Prepare for classification")
+        log_message("Listening for data from ESP32...")
+        log_message("Prepare for classification")
 
         while run_detection:
             if ser.in_waiting > 0:
@@ -65,7 +68,7 @@ def motion_detection():
 
                     if len(data_buffer) == data_buffer.maxlen and not full:
                         full = True
-                        print("Data buffer is full and ready to detect motion.")
+                        log_message("Data buffer is full and ready to detect motion.")
 
                     if full:
                         acc_x, acc_y, acc_z, *_ = data_list
@@ -75,10 +78,10 @@ def motion_detection():
                             if not motion_detected:
                                 motion_detected = True
                                 motion_start_time = time.time()
-                                print("Motion detected! Starting classification...")
+                                log_message("Motion detected! Starting classification...")
 
                     if motion_detected and time.time() - motion_start_time > 1.5:
-                        print("Collecting data for classification...")
+                        log_message("Collecting data for classification...")
                         motion_data = np.array(data_buffer, dtype=np.float32)
 
                         vals = scaler.fit_transform(motion_data)
@@ -95,13 +98,10 @@ def motion_detection():
                         class_order = model.classes_
                         predicted_class_probability = max(prediction)
 
-                        print(f"WORD PREDICTION: {predicted_class}, PROBABILITY: {predicted_class_probability}\n")
-                        
-                        print(f"All probabilities:")
+                        log_message(f"WORD PREDICTION: {predicted_class}, PROBABILITY: {predicted_class_probability}")
+                        log_message("All probabilities:")
                         for i in range(len(class_order)):
-                            print(f"{class_order[i]}: {prediction[i]}")
-
-
+                            log_message(f"{class_order[i]}: {prediction[i]}")
 
                         spotify.control_spotify(predicted_class)
                         motion_detected = False
@@ -111,13 +111,12 @@ def motion_detection():
                         ser.reset_input_buffer()
 
     except Exception as e:
-        print(f"Error: {e}")
+        log_message(f"Error: {e}")
 
     finally:
         if ser:
             ser.close()
-            print("Serial connection closed.")
-
+            log_message("Serial connection closed.")
 
 def start_detection():
     global run_detection
@@ -126,21 +125,22 @@ def start_detection():
     detection_thread.daemon = True
     detection_thread.start()
 
-
 def stop_detection():
     global run_detection
     run_detection = False
 
-
-# gui
+# GUI
 root = tk.Tk()
 root.title("Motion Detection Control")
-root.geometry("300x200")
+root.geometry("400x400")
 
 start_button = tk.Button(root, text="Start Detection", command=start_detection, bg="green", fg="white")
-start_button.pack(pady=20)
+start_button.pack(pady=10)
 
 stop_button = tk.Button(root, text="Stop Detection", command=stop_detection, bg="red", fg="white")
-stop_button.pack(pady=20)
+stop_button.pack(pady=10)
+
+output_text = tk.Text(root, height=15, width=50, state=tk.NORMAL)
+output_text.pack(pady=10)
 
 root.mainloop()
