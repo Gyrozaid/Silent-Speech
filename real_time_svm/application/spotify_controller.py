@@ -52,21 +52,15 @@ class SpotifyController:
                 self.sp.previous_track(device_id=device_id)
             elif command == 'rewind':
                 playback = self.sp.current_playback()
-                if playback and playback['is_playing']:
-                    current_position = playback['progress_ms']  # Current position in ms
-                    rewind_position = max(current_position - 15000, 0)  # Rewind 15 seconds
-                    self.sp.seek_track(rewind_position)
-                else:
-                    print("No active playback to rewind.")
+                current_position = playback['progress_ms']  # Current position in ms
+                rewind_position = max(current_position - 15000, 0)  # Rewind 15 seconds
+                self.sp.seek_track(rewind_position)
 
             elif command == 'skip':
                 playback = self.sp.current_playback()
-                if playback and playback['is_playing']:
-                    current_position = playback['progress_ms']  # Current position in ms
-                    rewind_position = max(current_position + 15000, 0)  # skip 15 seconds
-                    self.sp.seek_track(rewind_position)
-                else:
-                    print("No active playback to skip.")
+                current_position = playback['progress_ms']  # Current position in ms
+                rewind_position = max(current_position + 15000, 0)  # skip 15 seconds
+                self.sp.seek_track(rewind_position)
             else:
                 print('Unknown command')
         except spotipy.exceptions.SpotifyException as e:
