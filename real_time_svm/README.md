@@ -2,8 +2,6 @@
 
 This repository contains code for real time prediction of words based on acceleration and angular velocity data IMU sensor connected to an ESP32S3 and attached to the jaw. Both SVM and Random Forest models are trained on CSV files containing this data for words pause, play, skip, and rewind. These predictions are then sent to the Spotify API to control music playback
 
-
-
 - main:
     - main.c: build and flash to ESP32S3 to output x, y, z acceleration and gyroscope data as well as temperature to monitor
 
@@ -21,3 +19,13 @@ This repository contains code for real time prediction of words based on acceler
     - .pkl files for the preprocessing scaler and ML models
     - classify.py: real time classification code
     - spotify_controller.py: Spotify API implementation. Imported into classify.py
+
+
+
+# Usage
+
+1. Flash ESP code using espressif environment
+2. collect data with get_data.py
+3. train svm and random forest models with machine_learning.ipynb. Make sure you have all necessary packages
+4. set up spotify .env credentials within application folder 
+5. run classify.py to start the application and control spotify!

@@ -17,7 +17,7 @@ window_size = 3  # classification window
 sample_rate = 100
 target_length = 300
 
-# Load models
+#load models
 with open("svm_model.pkl", "rb") as file:
     svm_model = pickle.load(file)
 
@@ -29,7 +29,7 @@ model = random_forest
 with open("scaler.pkl", "rb") as file:
     scaler = pickle.load(file)
 
-# Vars
+#vars
 data_buffer = deque(maxlen=window_size * sample_rate)
 motion_detected = False
 motion_start_time = None
@@ -38,9 +38,12 @@ spotify = SpotifyController()
 ser = None
 run_detection = False
 
+
+#logs message to application instead of terminal
 def log_message(message):
     output_text.insert(tk.END, message + "\n")
     output_text.see(tk.END)
+
 
 def motion_detection():
     global motion_detected, motion_start_time, full, run_detection, data_buffer
@@ -102,20 +105,22 @@ def motion_detection():
                         for i in range(len(class_order)):
                             predictions[class_order[i]] = prediction[i]
 
-                        #change prediction
+                        #hard coded probability boundaries
                         if predicted_class == 'rewind' and predicted_class_probability < .5:
                             if predictions['skip'] > .2:
                                 predicted_class = 'skip'
                                 predicted_class_probability = predictions['skip']
                             
+                        
                         log_message(f"WORD PREDICTION: {predicted_class}, PROBABILITY: {predicted_class_probability}")
                         log_message("All probabilities:")
                         
                         for key, val in predictions.items():
                             log_message(f"{key}: {val}")
 
-
+                        #spotify control
                         spotify.control_spotify(predicted_class)
+                        
                         motion_detected = False
                         data_buffer.clear()
 

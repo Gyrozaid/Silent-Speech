@@ -18,7 +18,7 @@ window_size = 3  #classification window
 sample_rate = 100
 num_saves = 0
 gestures = ["play", "pause", "skip", "rewind"]
-num_repeats = 41
+num_repeats = 21
 
 
 data_buffer = deque(maxlen=window_size * sample_rate)
@@ -28,9 +28,8 @@ full = False
 
 try:
     print("Listening for data from ESP32...")
-
-    for gesture in gestures:
-        for repeat in range(21, num_repeats):
+    for repeat in range(12, num_repeats):
+        for gesture in gestures:
             run = True
             print(f"prepare for data collection: {gesture}: {repeat}")
             ser.reset_input_buffer()
