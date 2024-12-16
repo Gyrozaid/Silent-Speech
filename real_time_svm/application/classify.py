@@ -97,11 +97,23 @@ def motion_detection():
                         predicted_class = model.predict(X)[0]
                         class_order = model.classes_
                         predicted_class_probability = max(prediction)
+                        
+                        predictions = {}
+                        for i in range(len(class_order)):
+                            predictions[class_order[i]] = prediction[i]
 
+                        #change prediction
+                        if predicted_class == 'rewind' and predicted_class_probability < .5:
+                            if predictions['skip'] > .2:
+                                predicted_class = 'skip'
+                                predicted_class_probability = predictions['skip']
+                            
                         log_message(f"WORD PREDICTION: {predicted_class}, PROBABILITY: {predicted_class_probability}")
                         log_message("All probabilities:")
-                        for i in range(len(class_order)):
-                            log_message(f"{class_order[i]}: {prediction[i]}")
+                        
+                        for key, val in predictions.items():
+                            log_message(f"{key}: {val}")
+
 
                         spotify.control_spotify(predicted_class)
                         motion_detected = False
