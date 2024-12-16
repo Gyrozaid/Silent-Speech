@@ -1,50 +1,37 @@
-# Silent-Speech
-Repository for jaw sensor analysis, transforming jaw motion signals into speech.
+# Silent Speech
 
-## Setup
-1. Create a new folder for the project:
-   ```bash
-   mkdir Silent-Speech
-   cd Silent-Speech
-   ```
-2. Initialize a new Git repository:
-   ```bash
-   git init
-   ```
-3. Pull the repository from GitHub:
-   ```bash
-   git pull https://github.com/Gyrozaid/Silent-Speech
-   ```
-4. Set the remote origin:
-   ```bash
-   git remote add origin https://github.com/Gyrozaid/Silent-Speech
-   ```
+This repository contains code for real time prediction of words based on acceleration and angular velocity data IMU sensor connected to an ESP32S3 and attached to the jaw. Both SVM and Random Forest models are trained on CSV files containing this data for words pause, play, skip, and rewind. These predictions are then sent to the Spotify API to control music playback
 
-## Pull Requests
-1. Create a new branch:
-   ```bash
-   git checkout -b new_branch_name
-   ```
-2. Stage all changes:
-   ```bash
-   git add .
-   ```
-3. Commit changes:
-   ```bash
-   git commit -m "new commit message"
-   ```
-4. Push changes (for the first push to the new branch):
-   ```bash
-   git push --set-upstream origin new_branch_name
-   ```
-   - If the upstream is already set, use:
-     ```bash
-     git push
-     ```
+Within real_time_svm:
 
-5. Open a pull request on GitHub:
-   - Go to the repository on GitHub and create a new pull request.
-   - Notify the team when the pull request is ready for review and approval before merging into `main`.
+- main:
+    - main.c: build and flash to ESP32S3 to output x, y, z acceleration and gyroscope data as well as temperature to monitor
+
+- preprocessing:
+    - get_data.py: listens to output from ESP32S3 and outputs to csv files. 
+    - machine_learning.ipynb: code to train ML models
+
+- data:
+    - all CSV files used in analysis
+
+- old_data:
+    - unused CSV files
+
+- application:
+    - .pkl files for the preprocessing scaler and ML models
+    - classify.py: real time classification code
+    - spotify_controller.py: Spotify API implementation. Imported into classify.py
+
+
+
+# Usage
+
+1. Flash ESP code using espressif environment
+2. collect data with get_data.py
+3. train svm and random forest models with machine_learning.ipynb. Make sure you have all necessary packages, recommended to use conda env
+4. set up spotify .env credentials within application folder 
+5. run classify.py to start the application and control spotify!
+
 
 # Spotify Setup
 
