@@ -26,6 +26,6 @@ This repository contains code for real time prediction of words based on acceler
 
 1. Flash ESP code using espressif environment
 2. collect data with get_data.py
-3. train svm and random forest models with machine_learning.ipynb. Make sure you have all necessary packages
+3. train svm and random forest models with machine_learning.ipynb. Make sure you have all necessary packages, recommended to use conda env
 4. set up spotify .env credentials within application folder 
 5. run classify.py to start the application and control spotify!

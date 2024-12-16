@@ -86,9 +86,10 @@ def motion_detection():
                     if motion_detected and time.time() - motion_start_time > 1.5:
                         log_message("Collecting data for classification...")
                         motion_data = np.array(data_buffer, dtype=np.float32)
-
+                        vals = motion_data
+                        """
                         vals = scaler.fit_transform(motion_data)
-
+                        """
                         if vals.shape[0] < target_length:
                             padding = np.zeros((target_length - vals.shape[0], vals.shape[1]))
                             vals = np.vstack((vals, padding))
@@ -104,12 +105,6 @@ def motion_detection():
                         predictions = {}
                         for i in range(len(class_order)):
                             predictions[class_order[i]] = prediction[i]
-
-                        #hard coded probability boundaries
-                        if predicted_class == 'rewind' and predicted_class_probability < .5:
-                            if predictions['skip'] > .2:
-                                predicted_class = 'skip'
-                                predicted_class_probability = predictions['skip']
                             
                         
                         log_message(f"WORD PREDICTION: {predicted_class}, PROBABILITY: {predicted_class_probability}")
